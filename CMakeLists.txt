@@ -1554,9 +1554,9 @@ include(linting_target)
 # specify install location with `-DCMAKE_INSTALL_PREFIX=xyz`
 # Enable shared library with `-DBUILD_SHARED_LIBS=ON`
 
-set(cmake_configfile_install ${CMAKE_INSTALL_LIBDIR}/cmake/open62541)
-set(open62541_install_tools_dir share/open62541/tools)
-set(open62541_install_nodeset_dir share/open62541/tools/ua-nodeset)
+set(cmake_configfile_install ${CMAKE_INSTALL_LIBDIR}/cmake/sample-server-open62541)
+set(open62541_install_tools_dir share/sample-server-open62541/tools)
+set(open62541_install_nodeset_dir share/sample-server-open62541/tools/ua-nodeset)
 
 # This list of components allows to define a find_package requirement.
 # E.g.:
@@ -1609,6 +1609,8 @@ if(UA_ENABLE_DISCOVERY_MULTICAST)
     list(APPEND open62541_enabled_components "DiscoveryMulticast")
 endif()
 
+set_target_properties(open62541 PROPERTIES OUTPUT_NAME sample-server-open62541)
+
 # export library (either static or shared depending on BUILD_SHARED_LIBS)
 if(UA_PACK_DEBIAN)
     set(EXTRATARGETS "open62541-static")
@@ -1620,7 +1622,7 @@ install(TARGETS open62541 ${EXTRATARGETS}
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-        INCLUDES DESTINATION include)
+        INCLUDES DESTINATION include/sample-server-open62541)
 
 if(UA_ENABLE_AMALGAMATION)
 # Our default way of installation is the non-amalgamated version.
@@ -1630,7 +1632,7 @@ endif()
 
 include(CMakePackageConfigHelpers)
 configure_package_config_file("${CMAKE_CURRENT_SOURCE_DIR}/tools/cmake/open62541Config.cmake.in"
-                              "${CMAKE_CURRENT_BINARY_DIR}/open62541Config.cmake"
+                              "${CMAKE_CURRENT_BINARY_DIR}/sample-server-open62541Config.cmake"
                               INSTALL_DESTINATION "${cmake_configfile_install}"
                               PATH_VARS open62541_install_tools_dir
                                         open62541_install_nodeset_dir
@@ -1640,25 +1642,25 @@ configure_package_config_file("${CMAKE_CURRENT_SOURCE_DIR}/tools/cmake/open62541
 set(open62541_VERSION)
 get_target_property(open62541_VERSION open62541 VERSION)
 
-write_basic_package_version_file("${CMAKE_CURRENT_BINARY_DIR}/open62541ConfigVersion.cmake"
+write_basic_package_version_file("${CMAKE_CURRENT_BINARY_DIR}/sample-server-open62541ConfigVersion.cmake"
                                  VERSION ${open62541_VERSION}
                                  COMPATIBILITY AnyNewerVersion)
 
 install(EXPORT open62541Targets
-        FILE open62541Targets.cmake
+        FILE sample-server-open62541Targets.cmake
         DESTINATION "${cmake_configfile_install}"
         NAMESPACE open62541::)
 
 export(
     TARGETS open62541
     NAMESPACE open62541::
-    FILE ${CMAKE_CURRENT_BINARY_DIR}/open62541Targets.cmake
+    FILE ${CMAKE_CURRENT_BINARY_DIR}/sample-server-open62541Targets.cmake
 )
 
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/tools/cmake/macros_public.cmake" "${CMAKE_CURRENT_BINARY_DIR}/open62541Macros.cmake" COPYONLY)
 
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/open62541Config.cmake"
-              "${CMAKE_CURRENT_BINARY_DIR}/open62541ConfigVersion.cmake"
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/sample-server-open62541Config.cmake"
+              "${CMAKE_CURRENT_BINARY_DIR}/sample-server-open62541ConfigVersion.cmake"
               "${CMAKE_CURRENT_BINARY_DIR}/open62541Macros.cmake"
         DESTINATION "${cmake_configfile_install}")
 
@@ -1731,9 +1733,9 @@ if(NOT UA_ENABLE_AMALGAMATION)
 
         string(FIND "${full_path}" "${BASE_PATH_DEPS}" has_base_path)
         if("${has_base_path}" EQUAL 0)
-            install(FILES ${full_path} DESTINATION include${dir})
+            install(FILES ${full_path} DESTINATION include/sample-server-open62541${dir})
         else()
-            install(FILES ${full_path} DESTINATION include/open62541${dir})
+            install(FILES ${full_path} DESTINATION include/sample-server-open62541/open62541${dir})
         endif()
     endforeach()
 else()
