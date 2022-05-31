@@ -1649,11 +1649,11 @@ write_basic_package_version_file("${CMAKE_CURRENT_BINARY_DIR}/sample-server-open
 install(EXPORT open62541Targets
         FILE sample-server-open62541Targets.cmake
         DESTINATION "${cmake_configfile_install}"
-        NAMESPACE open62541::)
+        NAMESPACE sample-server-open62541::)
 
 export(
     TARGETS open62541
-    NAMESPACE open62541::
+    NAMESPACE sample-server-open62541::
     FILE ${CMAKE_CURRENT_BINARY_DIR}/sample-server-open62541Targets.cmake
 )
 
