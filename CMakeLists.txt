@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0...3.12)
+cmake_minimum_required(VERSION 3.0...3.23)
 project(open62541)
 # set(CMAKE_VERBOSE_MAKEFILE ON)
 if(${CMAKE_VERSION} VERSION_LESS 3.12)
@@ -15,7 +15,7 @@ include(GNUInstallDirs)
 
 # Set when installed via make install
 set(open62541_TOOLS_DIR ${PROJECT_SOURCE_DIR}/tools)
-set(open62541_NODESET_DIR ${PROJECT_SOURCE_DIR}/deps/ua-nodeset)
+set(open62541_NODESET_DIR ${PROJECT_SOURCE_DIR}/ua-nodeset)
 set(XDP_LIBRARY "/usr/local/src/bpf-next/tools/lib/bpf/libbpf.a")
 
 include(macros_internal)
@@ -526,7 +526,6 @@ if(NOT UA_FORCE_CPP AND (CMAKE_COMPILER_IS_GNUCC OR "x${CMAKE_C_COMPILER_ID}" ST
     check_add_cc_flag("-Wall")      # Warnings
     check_add_cc_flag("-Wextra")    # More warnings
     check_add_cc_flag("-Wpedantic") # Standard compliance
-    check_add_cc_flag("-Werror")    # All warnings are errors
 
     check_add_cc_flag("-Wno-static-in-inline") # Clang doesn't like the use of static inline methods inside static inline methods
     check_add_cc_flag("-Wno-overlength-strings") # May happen in the nodeset compiler when complex values are directly encoded
@@ -576,17 +575,6 @@ if(NOT UA_FORCE_CPP AND (CMAKE_COMPILER_IS_GNUCC OR "x${CMAKE_C_COMPILER_ID}" ST
 
         # IPO requires too much memory for unit tests
         # GCC docu recommends to compile all files with the same options, therefore ignore it completely
-        if(NOT UA_BUILD_UNIT_TESTS AND NOT DEFINED CMAKE_INTERPROCEDURAL_OPTIMIZATION)
-            # needed to check if IPO is supported (check needs cmake > 3.9)
-            if("${CMAKE_VERSION}" VERSION_GREATER 3.9)
-                cmake_policy(SET CMP0069 NEW) # needed as long as required cmake < 3.9
-                include(CheckIPOSupported)
-                check_ipo_supported(RESULT CC_HAS_IPO) # Inter Procedural Optimization / Link Time Optimization (should be same as -flto)
-                if(CC_HAS_IPO)
-                    set(CMAKE_INTERPROCEDURAL_OPTIMIZATION ON)
-                endif()
-            endif()
-        endif()
     endif()
 
     if(UA_ENABLE_AMALGAMATION)
@@ -659,7 +647,7 @@ if(APPLE)
 endif()
 
 if(MSVC)
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /W3 /WX /w44996") # Compiler warnings, error on warning
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /W3 /w44996") # Compiler warnings, error on warning
 
   if(UA_MSVC_FORCE_STATIC_CRT AND NOT BUILD_SHARED_LIBS)
     set(CompilerFlags CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE CMAKE_C_FLAGS
@@ -1313,7 +1301,7 @@ list(APPEND open62541_LIBRARIES ${ua_architecture_append_to_library})
 target_compile_definitions(open62541 PUBLIC UA_ARCHITECTURE_${UA_ARCHITECTURE_UPPER})
 
 # DLL requires linking to dependencies
-target_link_libraries(open62541 ${open62541_LIBRARIES})
+target_link_libraries(open62541 PUBLIC ${open62541_LIBRARIES})
 
 ##########################
 # Build Selected Targets #
