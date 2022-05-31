@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0...3.12)
+cmake_minimum_required(VERSION 3.0...3.23)
 if(UA_BUILD_FUZZING OR UA_BUILD_OSS_FUZZ OR UA_BUILD_FUZZING_CORPUS)
     project(open62541) # We need to have C++ support configured for fuzzing
 else()
@@ -23,7 +23,7 @@ include(GNUInstallDirs)
 
 # Set when installed via make install
 set(open62541_TOOLS_DIR ${PROJECT_SOURCE_DIR}/tools)
-set(open62541_NODESET_DIR ${PROJECT_SOURCE_DIR}/deps/ua-nodeset)
+set(open62541_NODESET_DIR ${PROJECT_SOURCE_DIR}/ua-nodeset)
 
 include(macros_internal)
 include(macros_public)
@@ -712,17 +712,6 @@ if(NOT UA_FORCE_CPP AND (CMAKE_COMPILER_IS_GNUCC OR "x${CMAKE_C_COMPILER_ID}" ST
 
         # IPO requires too much memory for unit tests
         # GCC docu recommends to compile all files with the same options, therefore ignore it completely
-        if(NOT UA_BUILD_UNIT_TESTS AND NOT DEFINED CMAKE_INTERPROCEDURAL_OPTIMIZATION)
-            # needed to check if IPO is supported (check needs cmake > 3.9)
-            if("${CMAKE_VERSION}" VERSION_GREATER 3.9)
-                cmake_policy(SET CMP0069 NEW) # needed as long as required cmake < 3.9
-                include(CheckIPOSupported)
-                check_ipo_supported(RESULT CC_HAS_IPO) # Inter Procedural Optimization / Link Time Optimization (should be same as -flto)
-                if(CC_HAS_IPO)
-                    set(CMAKE_INTERPROCEDURAL_OPTIMIZATION ON)
-                endif()
-            endif()
-        endif()
     endif()
 
     if(UA_ENABLE_AMALGAMATION)
@@ -1513,7 +1502,7 @@ list(APPEND open62541_LIBRARIES ${ua_architecture_append_to_library})
 target_compile_definitions(open62541 PUBLIC UA_ARCHITECTURE_${UA_ARCHITECTURE_UPPER})
 
 # DLL requires linking to dependencies
-target_link_libraries(open62541 ${open62541_LIBRARIES})
+target_link_libraries(open62541 PUBLIC ${open62541_LIBRARIES})
 
 ##########################
 # Build Selected Targets #
