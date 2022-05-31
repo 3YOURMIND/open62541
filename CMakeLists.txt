@@ -808,9 +808,6 @@ file(MAKE_DIRECTORY "${PROJECT_BINARY_DIR}/src_generated")
 # Generate the config.h
 configure_file(include/open62541/config.h.in ${PROJECT_BINARY_DIR}/src_generated/open62541/config.h)
 
-# Generate a .pc file for pkg-config
-configure_file(tools/open62541.pc.in ${PROJECT_BINARY_DIR}/src_generated/open62541.pc @ONLY)
-
 if(UA_ENABLE_DISCOVERY_MULTICAST)
   include(GenerateExportHeader)
     set(MDNSD_LOGLEVEL 300 CACHE STRING "Level at which logs shall be reported" FORCE)
@@ -1667,11 +1664,6 @@ install(FILES "${CMAKE_CURRENT_BINARY_DIR}/sample-server-open62541Config.cmake"
 if(UA_ENABLE_ENCRYPTION_MBEDTLS)
     install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/tools/cmake/FindMbedTLS.cmake"
             DESTINATION "${cmake_configfile_install}")
-endif()
-
-if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
-    install(FILES "${PROJECT_BINARY_DIR}/src_generated/open62541.pc"
-            DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
 endif()
 
 set(UA_install_tools_dirs "tools/certs"
